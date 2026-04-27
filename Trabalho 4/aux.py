@@ -8,13 +8,13 @@ import os
 # CHAVES GLOBAIS
 # =========================================================
 
-# gera chave privada RSA (usada para assinatura)
+# gera chave privada RSA (usada na 3 e 4)
 private_key = rsa.generate_private_key(
     public_exponent=65537,
     key_size=2048
 )
 
-# chave pública correspondente (usada para verificação)
+# chave pública correspondente (usada na 3 e 4)
 public_key = private_key.public_key()
 
 # chave simétrica AES (derivada de uma string fixa)
@@ -65,7 +65,7 @@ def serialize_payload(file_name: bytes, hash_bytes: bytes, file_data: bytes) -> 
         struct.pack(">I", len(file_name)) +
         file_name +
 
-        # tamanho do campo de hash (ou assinatura)
+        # tamanho do campo de hash
         struct.pack(">I", len(hash_bytes)) +
         hash_bytes +
 
@@ -90,7 +90,7 @@ def deserialize_payload(payload: bytes):
     file_name = payload[offset:offset+name_len].decode()
     offset += name_len
 
-    # lê tamanho do campo hash/assinatura
+    # lê tamanho do campo hash
     hash_len = struct.unpack(">I", payload[offset:offset+4])[0]
     offset += 4
 

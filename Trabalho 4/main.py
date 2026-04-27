@@ -18,21 +18,21 @@ if __name__ == "__main__":
         os.system("cls" if os.name == "nt" else "clear")
 
     send_algorithms = {
-        "1": ("exercicio1_send (confidencialidade + integridade)", exercicio1_send),
-        "2": ("exercicio2_send (integridade)", exercicio2_send),
-        "3": ("exercicio3_send (autenticidade + integridade)", exercicio3_send),
-        "4": ("exercicio4_send (confidencialidade + autenticidade + integridade)", exercicio4_send),
-        "5": ("exercicio5_send (integridade com hash + salt)", exercicio5_send),
-        "6": ("exercicio6_send (confidencialidade + integridade com salt)", exercicio6_send),
+        "1": ("exercicio1_send", exercicio1_send),
+        "2": ("exercicio2_send", exercicio2_send),
+        "3": ("exercicio3_send", exercicio3_send),
+        "4": ("exercicio4_send", exercicio4_send),
+        "5": ("exercicio5_send", exercicio5_send),
+        "6": ("exercicio6_send", exercicio6_send),
     }
 
     receive_algorithms = {
-        "1": ("exercicio1_receive (confidencialidade + integridade)", exercicio1_receive),
-        "2": ("exercicio2_receive (integridade)", exercicio2_receive),
-        "3": ("exercicio3_receive (autenticidade + integridade)", exercicio3_receive),
-        "4": ("exercicio4_receive (confidencialidade + autenticidade + integridade)", exercicio4_receive),
-        "5": ("exercicio5_receive (integridade com hash + salt)", exercicio5_receive),
-        "6": ("exercicio6_receive (confidencialidade + integridade com salt)", exercicio5_receive),
+        "1": ("exercicio1_receive", exercicio1_receive),
+        "2": ("exercicio2_receive", exercicio2_receive),
+        "3": ("exercicio3_receive", exercicio3_receive),
+        "4": ("exercicio4_receive", exercicio4_receive),
+        "5": ("exercicio5_receive", exercicio5_receive),
+        "6": ("exercicio6_receive", exercicio5_receive),
     }
 
     while True:

@@ -5,7 +5,6 @@ from cryptography.hazmat.primitives import hashes
 # =========================================================
 # EXERCICIO 1
 # AES + HASH
-# Garante: confidencialidade + integridade
 # =========================================================
 def exercicio1_send(input_file_path: str, key: bytes) -> str:
     # lê arquivo
@@ -33,7 +32,6 @@ def exercicio1_send(input_file_path: str, key: bytes) -> str:
 # =========================================================
 # EXERCICIO 2
 # HASH criptografado (arquivo em claro)
-# Garante: integridade (sem confidencialidade)
 # =========================================================
 def exercicio2_send(input_file_path: str, key: bytes) -> str:
     file_name, file_data = read_file(input_file_path)
@@ -59,31 +57,25 @@ def exercicio2_send(input_file_path: str, key: bytes) -> str:
 # =========================================================
 # EXERCICIO 3
 # ASSINATURA DIGITAL (RSA)
-# Garante: autenticidade + integridade
 # =========================================================
 def exercicio3_send(input_file_path: str, key: bytes) -> str:
     file_name, file_data = read_file(input_file_path)
 
-    # gera hash
+    # gera hash (opcional, se quiser checar integridade depois)
     hash_bytes = compute_hash(file_data)
 
-    # assina o hash com chave privada
-    # https://cryptography.io/en/latest/hazmat/primitives/asymmetric/rsa/#signing
-    # A private key can be used to sign a message. This allows anyone with the public key to verify 
-    # that the message was created by someone who possesses the corresponding private key. RSA signatures 
-    # require a specific hash function, and padding to be used. Here is an example of signing message using RSA, 
-    # with a secure hash function and padding
-    signature = private_key.sign(
+    # criptografa o hash com chave pública
+    encrypted_hash = public_key.encrypt(
         hash_bytes,
-        padding.PSS(
-            mgf=padding.MGF1(hashes.SHA256()),
-            salt_length=padding.PSS.MAX_LENGTH
-        ),
-        hashes.SHA256()
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA256()),
+            algorithm=hashes.SHA256(),
+            label=None
+        )
     )
 
-    # payload contém assinatura + dados
-    payload = serialize_payload(file_name, signature, file_data)
+    # payload = hash criptografado + dados
+    payload = serialize_payload(file_name, encrypted_hash, file_data)
 
     output_file_path = f"{input_file_path}_enc"
 
@@ -97,7 +89,6 @@ def exercicio3_send(input_file_path: str, key: bytes) -> str:
 # =========================================================
 # EXERCICIO 4
 # ASSINATURA + AES
-# Garante: confidencialidade + autenticidade + integridade
 # =========================================================
 def exercicio4_send(input_file_path: str, key: bytes) -> str:
     file_name, file_data = read_file(input_file_path)
@@ -105,18 +96,18 @@ def exercicio4_send(input_file_path: str, key: bytes) -> str:
     # gera hash
     hash_bytes = compute_hash(file_data)
 
-    # assina o hash
-    signature = private_key.sign(
+    # criptografa o hash com a chave pública (igual exercicio 3)
+    encrypted_hash = public_key.encrypt(
         hash_bytes,
-        padding.PSS(
-            mgf=padding.MGF1(hashes.SHA256()),
-            salt_length=padding.PSS.MAX_LENGTH
-        ),
-        hashes.SHA256()
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA256()),
+            algorithm=hashes.SHA256(),
+            label=None
+        )
     )
 
     # monta payload
-    payload = serialize_payload(file_name, signature, file_data)
+    payload = serialize_payload(file_name, encrypted_hash, file_data)
 
     # criptografa tudo com AES
     encrypted = aes_encrypt(payload, key)
@@ -133,7 +124,6 @@ def exercicio4_send(input_file_path: str, key: bytes) -> str:
 # =========================================================
 # EXERCICIO 5
 # HASH com SALT + AES
-# Garante: integridade com salt + confidencialidade
 # =========================================================
 def exercicio5_send(input_file_path: str, key: bytes) -> str:
     file_name, file_data = read_file(input_file_path)
@@ -162,8 +152,6 @@ def exercicio5_send(input_file_path: str, key: bytes) -> str:
 # =========================================================
 # EXERCICIO 6
 # HASH com SALT + AES
-# (equivalente ao 5, mas destacado como evolução conceitual)
-# Garante: confidencialidade + integridade com salt
 # =========================================================
 def exercicio6_send(input_file_path: str, key: bytes) -> str:
     file_name, file_data = read_file(input_file_path)

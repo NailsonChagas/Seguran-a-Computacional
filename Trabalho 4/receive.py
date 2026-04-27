@@ -5,7 +5,6 @@ from cryptography.hazmat.primitives import hashes
 # =========================================================
 # EXERCICIO 1
 # AES + HASH
-# Garante: confidencialidade + integridade
 # =========================================================
 def exercicio1_receive(encrypted_file_path: str, key: bytes, output_dir: str = ".") -> str:
     # lê arquivo criptografado
@@ -38,7 +37,6 @@ def exercicio1_receive(encrypted_file_path: str, key: bytes, output_dir: str = "
 # =========================================================
 # EXERCICIO 2
 # HASH criptografado com AES
-# Garante: integridade (sem confidencialidade do arquivo)
 # =========================================================
 def exercicio2_receive(encrypted_file_path: str, key: bytes, output_dir: str = ".") -> str:
     with open(encrypted_file_path, "rb") as f:
@@ -68,34 +66,31 @@ def exercicio2_receive(encrypted_file_path: str, key: bytes, output_dir: str = "
 
 # =========================================================
 # EXERCICIO 3
-# ASSINATURA DIGITAL (RSA)
-# Garante: autenticidade + integridade
+# HASH com RSA
 # =========================================================
 def exercicio3_receive(encrypted_file_path: str, key: bytes, output_dir: str = ".") -> str:
     with open(encrypted_file_path, "rb") as f:
         payload = f.read()
 
-    # extrai assinatura e dados
-    file_name, signature, file_data = deserialize_payload(payload)
+    file_name, encrypted_hash, file_data = deserialize_payload(payload)
 
-    # recalcula hash do arquivo
+    # descriptografa hash com chave privada
+    decrypted_hash = private_key.decrypt(
+        encrypted_hash,
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA256()),
+            algorithm=hashes.SHA256(),
+            label=None
+        )
+    )
+
+    # recalcula hash
     hash_bytes = compute_hash(file_data)
 
-    try:
-        # verifica assinatura com chave pública
-        public_key.verify(
-            signature,
-            hash_bytes,
-            padding.PSS(
-                mgf=padding.MGF1(hashes.SHA256()),
-                salt_length=padding.PSS.MAX_LENGTH
-            ),
-            hashes.SHA256()
-        )
-        print("ok (assinatura válida)")
-
-    except Exception:
-        print("assinatura inválida")
+    if decrypted_hash == hash_bytes:
+        print("ok (integridade válida)")
+    else:
+        print("dados corrompidos")
         return
 
     output_file_path = os.path.join(output_dir, file_name)
@@ -106,39 +101,37 @@ def exercicio3_receive(encrypted_file_path: str, key: bytes, output_dir: str = "
 
     return output_file_path
 
-
 # =========================================================
 # EXERCICIO 4
-# ASSINATURA + AES
-# Garante: confidencialidade + autenticidade + integridade
+#  HASH com RSA + AES
 # =========================================================
 def exercicio4_receive(encrypted_file_path: str, key: bytes, output_dir: str = ".") -> str:
     with open(encrypted_file_path, "rb") as f:
         encrypted = f.read()
 
-    # primeiro descriptografa o conteúdo
+    # descriptografa AES
     payload = aes_decrypt(encrypted, key)
 
-    # extrai assinatura e dados
-    file_name, signature, file_data = deserialize_payload(payload)
+    # extrai dados
+    file_name, encrypted_hash, file_data = deserialize_payload(payload)
 
+    # descriptografa hash com chave privada
+    decrypted_hash = private_key.decrypt(
+        encrypted_hash,
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA256()),
+            algorithm=hashes.SHA256(),
+            label=None
+        )
+    )
+
+    # recalcula hash
     hash_bytes = compute_hash(file_data)
 
-    try:
-        # valida assinatura
-        public_key.verify(
-            signature,
-            hash_bytes,
-            padding.PSS(
-                mgf=padding.MGF1(hashes.SHA256()),
-                salt_length=padding.PSS.MAX_LENGTH
-            ),
-            hashes.SHA256()
-        )
-        print("ok (assinatura válida + conteúdo íntegro)")
-
-    except Exception:
-        print("assinatura inválida ou dados corrompidos")
+    if decrypted_hash == hash_bytes:
+        print("ok (integridade válida + confidencialidade)")
+    else:
+        print("dados corrompidos")
         return
 
     output_file_path = os.path.join(output_dir, file_name)
@@ -149,11 +142,9 @@ def exercicio4_receive(encrypted_file_path: str, key: bytes, output_dir: str = "
 
     return output_file_path
 
-
 # =========================================================
 # EXERCICIO 5
 # HASH com SALT (sem proteção do arquivo)
-# Garante: integridade com salt
 # =========================================================
 def exercicio5_receive(encrypted_file_path: str, key: bytes, output_dir: str = ".") -> str:
     with open(encrypted_file_path, "rb") as f:
@@ -188,7 +179,6 @@ def exercicio5_receive(encrypted_file_path: str, key: bytes, output_dir: str = "
 # =========================================================
 # EXERCICIO 6
 # HASH com SALT + AES
-# Garante: confidencialidade + integridade com salt
 # =========================================================
 def exercicio6_receive(encrypted_file_path: str, key: bytes, output_dir: str = ".") -> str:
     with open(encrypted_file_path, "rb") as f:
