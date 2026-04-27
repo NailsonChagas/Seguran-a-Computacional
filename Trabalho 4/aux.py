@@ -114,10 +114,10 @@ def deserialize_payload(payload: bytes):
 # =========================================================
 def aes_encrypt(data: bytes, key: bytes) -> bytes:
     # inicializa AES-GCM com chave
-    aesgcm = AESGCM(key)
+    aesgcm = AESGCM(key) # 256 bits
 
     # gera nonce aleatório (12 bytes padrão)
-    nonce = os.urandom(12)
+    nonce = os.urandom(12) # valor único por criptografia, usado junto com a chave
 
     # retorna nonce + dados criptografados
     return nonce + aesgcm.encrypt(nonce, data, None)

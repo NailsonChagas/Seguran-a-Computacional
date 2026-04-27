@@ -68,6 +68,11 @@ def exercicio3_send(input_file_path: str, key: bytes) -> str:
     hash_bytes = compute_hash(file_data)
 
     # assina o hash com chave privada
+    # https://cryptography.io/en/latest/hazmat/primitives/asymmetric/rsa/#signing
+    # A private key can be used to sign a message. This allows anyone with the public key to verify 
+    # that the message was created by someone who possesses the corresponding private key. RSA signatures 
+    # require a specific hash function, and padding to be used. Here is an example of signing message using RSA, 
+    # with a secure hash function and padding
     signature = private_key.sign(
         hash_bytes,
         padding.PSS(
