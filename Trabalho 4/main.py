@@ -27,12 +27,12 @@ if __name__ == "__main__":
     }
 
     receive_algorithms = {
-        "1": ("exercicio1_receive", exercicio1_receive),
-        "2": ("exercicio2_receive", exercicio2_receive),
-        "3": ("exercicio3_receive", exercicio3_receive),
-        "4": ("exercicio4_receive", exercicio4_receive),
-        "5": ("exercicio5_receive", exercicio5_receive),
-        "6": ("exercicio6_receive", exercicio5_receive),
+        "1": ("exercicio1_receive (confidencialidade + integridade)", exercicio1_receive),
+        "2": ("exercicio2_receive (integridade)", exercicio2_receive),
+        "3": ("exercicio3_receive (autenticidade + integridade)", exercicio3_receive),
+        "4": ("exercicio4_receive (confidencialidade + autenticidade + integridade)", exercicio4_receive),
+        "5": ("exercicio5_receive (integridade com hash + salt)", exercicio5_receive),
+        "6": ("exercicio6_receive (confidencialidade + integridade com salt)", exercicio5_receive),
     }
 
     while True:
@@ -52,7 +52,10 @@ if __name__ == "__main__":
         clear()
 
         # listar arquivos
-        files = [f for f in os.listdir(".") if os.path.isfile(f)]
+        files = [
+            f for f in os.listdir(".")
+            if os.path.isfile(f) and not f.endswith(".py")
+        ]
 
         if not files:
             print("Nenhum arquivo encontrado no diretório.")
