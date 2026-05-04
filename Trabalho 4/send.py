@@ -138,7 +138,7 @@ def exercicio5_send(input_file_path: str, key: bytes) -> str:
     payload = serialize_payload(file_name, hash_bytes, file_data)
 
     # criptografa tudo
-    encrypted = aes_encrypt(payload, key)
+    encrypted = payload #aes_encrypt(payload, key)
 
     output_file_path = f"{input_file_path}_enc"
 

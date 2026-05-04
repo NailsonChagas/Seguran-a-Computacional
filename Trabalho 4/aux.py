@@ -21,7 +21,7 @@ public_key = private_key.public_key()
 # usada para criptografia com AES-GCM
 key = hashlib.sha256(b"AAAAAAAAAAAAAAAAAAAAA").digest()
 
-# salt global usado para reforçar o hash
+# salt global
 salt = "BBBBBBBBBBBBBBB"
 
 # =========================================================

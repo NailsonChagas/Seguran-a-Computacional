@@ -151,7 +151,7 @@ def exercicio5_receive(encrypted_file_path: str, key: bytes, output_dir: str = "
         encrypted = f.read()
 
     # descriptografa
-    payload = aes_decrypt(encrypted, key)
+    payload = encrypted # aes_decrypt(encrypted, key)
 
     file_name, stored_hash, file_data = deserialize_payload(payload)
 
